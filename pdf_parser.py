@@ -45,6 +45,3 @@ def save_pdf(washes):
 
 def main():
     save_pdf(parse_pdf('washes.pdf'))
-
-if __name__ == '__main__':
-    main()

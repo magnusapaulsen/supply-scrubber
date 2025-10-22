@@ -33,6 +33,3 @@ def save(data, fp):
 
 def main():
     save(calculate_total(load('washes.json'), load('price_list.json')), 'washes.json')
-
-if __name__ == '__main__':
-    main()

@@ -32,6 +32,3 @@ def save(data):
 
 def main():
     save(group_by_address(load('washes.json')))
-
-if __name__ == '__main__':
-    main()

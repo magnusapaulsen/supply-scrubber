@@ -20,13 +20,13 @@ A Python program leveraging pdfplumber and RegEx to parse PDF supply sheets, gen
 
 ## Usage
 
-1. Place your PDF supply sheets (e.g., `washes.pdf`) in the project directory.
-2. Run the script:
+1. Place your PDF supply sheets (`washes.pdf`) in the project directory.
+2. Place your JSON price list (`price_list.json`) in the project directory.
+3. Run the script:
     python main.py
-3. View the output in the console or check `supplies_overview.csv` for the aggregated data.
+4. View the results in the JSON files (`washes.json`, `apartments.json`)
 
 ## Requirements
 - `pdfplumber`
-- `re` (built-in Python module)
 
 List of dependencies is in `requirements.txt`.
