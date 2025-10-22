@@ -31,4 +31,8 @@ def save(data, fp):
     with open(fp, 'w') as f:
         json.dump(data, f, indent = 4)
 
-save(calculate_total(load('washes.json'), load('price_list.json')), 'washes.json')
+def main():
+    save(calculate_total(load('washes.json'), load('price_list.json')), 'washes.json')
+
+if __name__ == '__main__':
+    main()

@@ -30,4 +30,8 @@ def save(data):
     with open('apartments.json', 'w') as f:
         json.dump(data, f, indent = 4)
 
-save(group_by_address(load('washes.json')))
+def main():
+    save(group_by_address(load('washes.json')))
+
+if __name__ == '__main__':
+    main()

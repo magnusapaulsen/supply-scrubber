@@ -20,7 +20,7 @@ A Python program leveraging pdfplumber and RegEx to parse PDF supply sheets, gen
 
 ## Usage
 
-1. Place your PDF supply sheets (e.g., `sheet.pdf`) in the project directory.
+1. Place your PDF supply sheets (e.g., `washes.pdf`) in the project directory.
 2. Run the script:
     python main.py
 3. View the output in the console or check `supplies_overview.csv` for the aggregated data.
