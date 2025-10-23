@@ -43,5 +43,5 @@ def save_pdf(washes):
         json.dump(washes, f, indent = 4)
     print('Saved!')
 
-def main():
-    save_pdf(parse_pdf('washes.pdf'))
+def main(fp):
+    save_pdf(parse_pdf(fp))
