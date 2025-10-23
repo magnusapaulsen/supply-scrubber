@@ -5,25 +5,23 @@ def load(fp):
         return json.load(f)
 
 def calculate_total(washes, price_list):
+    # Loop through all washes
     for wash in washes:
+        # Add total cost of items
         if 'Total' not in wash['Items'].keys():
             total = 0
             for item, quantity in wash['Items'].items():
                 if item in price_list.keys():
                     total += quantity * price_list[item]
             wash['Items']['Total'] = total
-            print('Saved total of items...')
-        else:
-            print('Already calculated...')
+
+        # Add total number of guests
         if 'Total' not in wash['Guests'].keys():
             total = 0
             for item, quantity in wash['Guests'].items():
                 if item in price_list.keys():
                     total += quantity * price_list[item]
             wash['Guests']['Total'] = total
-            print('Saved total of guests...')
-        else:
-            print('Already calculated...')
 
     return washes
 

@@ -5,14 +5,18 @@ def load(fp):
         return json.load(f)
 
 def group_by_address(washes):
+    # Create an overview of the washes for each apartment
     addresses = {}
+    # Loop through all washes
     for wash in washes:
+        # Add the address to the dictionary if it is not there already
         if wash['Address'] not in addresses.keys():
             addresses[wash['Address']] = {'Items': {}, 'Guests': {}}
             for item, quantity in wash['Items'].items():
                 addresses[wash['Address']]['Items'][item] = quantity
             for item, quantity in wash['Guests'].items():
                 addresses[wash['Address']]['Guests'][item] = quantity
+        # If it is there already, add to the total for the apartment
         else:
             for item, quantity in wash['Items'].items():
                 if item not in addresses[wash['Address']]['Items'].keys():

@@ -3,10 +3,10 @@
 A Python program leveraging pdfplumber and RegEx to parse PDF supply sheets, generating an overview of cleaning and restocking tasks for an AirBnB business.
 
 ## Features
-- Extracts due dates, addresses, task names, and supply quantities from PDF files.
-- Aggregates supplies by date and creates a markdown table overview.
-- Ignores non-supply data (e.g., "Amount of Guests").
-- Outputs results to console and optionally saves to a CSV file.
+- Extracts apartment names, addresses, task names, dates, supply quantities and number of guests from PDF files.
+- Creates an overview for each wash in a month.
+- Creates a monthly overview for each apartment.
+- Saves result to JSON-files.
 
 ## Installation
 
@@ -20,10 +20,11 @@ A Python program leveraging pdfplumber and RegEx to parse PDF supply sheets, gen
 
 ## Usage
 
-1. Place your PDF supply sheets (`washes.pdf`) in the project directory.
-2. Place your JSON price list (`price_list.json`) in the project directory.
-3. Run the script:
+1. Place your JSON price list (`price_list.json`) in the project directory.
+2. Run the script:
     python main.py
+    python3 main.py
+3. Navigate the GUI to select PDF and run the parsing.
 4. View the results in the JSON files (`washes.json`, `apartments.json`)
 
 ## Requirements

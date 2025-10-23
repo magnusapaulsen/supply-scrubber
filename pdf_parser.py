@@ -14,6 +14,7 @@ def parse_pdf(fp):
             # Turn text into list of lines
             lines = [line.strip() for line in text.splitlines() if line.strip()]
             
+            # Create new dictionary using RegEx
             wash['Name'] = lines[1]
             wash['Address'] = lines[2]
             task_match = re.search(r'Task Name\s+(.+)', text)
@@ -24,7 +25,6 @@ def parse_pdf(fp):
                 wash['Date'] = date_match.group(1)
             wash['Items'] = {}
             wash['Guests'] = {}
-
             matches = re.findall(r'☐\s+(.+?)\s+(\d+)\s*$', text, re.MULTILINE)
             for item_name, quantity in matches:
                 if 'Amount of Guests' in item_name:
