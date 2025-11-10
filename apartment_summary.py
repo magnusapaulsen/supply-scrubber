@@ -11,7 +11,7 @@ def group_by_name(washes):
     for wash in washes:
         # Add the address to the dictionary if it is not there already
         if wash['Name'] not in names.keys():
-            names[wash['Name']] = {'Items': {}, 'Guests': {}}
+            names[wash['Name']] = {'Items': {}, 'Guests': {}, 'Washes': {}}
             for item, quantity in wash['Items'].items():
                 names[wash['Name']]['Items'][item] = quantity
             for item, quantity in wash['Guests'].items():

@@ -1,7 +1,7 @@
 import tkinter as tk
 import threading
 from tkinter import filedialog
-import pdf_parser, calculate_total, apartments
+import pdf_parser, calculate_total, apartment_summary, wash_summary
 
 def select_file():
     filepath = filedialog.askopenfilename(
@@ -38,9 +38,13 @@ def main(status_label, root, run_button):
         root.update_idletasks()
         calculate_total.main()
 
-        status_label.config(text='Processing apartments...', foreground='#0000ff')
+        status_label.config(text='Grouping apartments...', foreground='#0000ff')
         root.update_idletasks()
-        apartments.main()
+        apartment_summary.main()
+
+        status_label.config(text='Calculating washes...', foreground='#0000ff')
+        root.update_idletasks()
+        wash_summary.main()
 
         status_label.config(text='Complete!', foreground='#00ff00')
         
@@ -59,18 +63,18 @@ def run_in_thread():
     ).start()
 
 def on_enter_browse(e):
-    browse_button.config(bg='#ff0000')
+    browse_button.config(bg='#222222')
 
 def on_leave_browse(e):
-    browse_button.config(bg='#00ff00')
+    browse_button.config(bg='#333333')
 
 def on_enter_run(e):
     if run_button['state'] == 'normal':
-        run_button.config(bg='#0A84FF')
+        run_button.config(bg='#222222')
 
 def on_leave_run(e):
     if run_button['state'] == 'normal':
-        run_button.config(bg='#007AFF')
+        run_button.config(bg='#333333')
 
 if __name__ == '__main__':
     root = tk.Tk()
@@ -94,8 +98,8 @@ if __name__ == '__main__':
         text='📁 Select PDF File',
         command=select_file,
         font=('Roboto', 12),
-        bg='#000000', # Ser ikke bakgrunn pr nå
-        fg='#111111',
+        bg='#333333', # Ser ikke bakgrunn pr nå
+        fg='#ffffff',
         padx=10,
         pady=5,
         cursor='hand2',
@@ -131,8 +135,8 @@ if __name__ == '__main__':
         text='Run',
         command=run_in_thread,
         font=('Roboto', 12),
-        bg='#000000', # Ser ikke bakgrunn pr nå
-        fg='#111111',
+        bg='#333333', # Ser ikke bakgrunn pr nå
+        fg='#ffffff',
         padx=10,
         pady=5,
         cursor='hand2',
