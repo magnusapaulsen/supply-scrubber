@@ -4,35 +4,35 @@ def load(fp):
     with open(fp, 'r') as f:
         return json.load(f)
 
-def group_by_address(washes):
+def group_by_name(washes):
     # Create an overview of the washes for each apartment
-    addresses = {}
+    names = {}
     # Loop through all washes
     for wash in washes:
         # Add the address to the dictionary if it is not there already
-        if wash['Address'] not in addresses.keys():
-            addresses[wash['Address']] = {'Items': {}, 'Guests': {}}
+        if wash['Name'] not in names.keys():
+            names[wash['Name']] = {'Items': {}, 'Guests': {}}
             for item, quantity in wash['Items'].items():
-                addresses[wash['Address']]['Items'][item] = quantity
+                names[wash['Name']]['Items'][item] = quantity
             for item, quantity in wash['Guests'].items():
-                addresses[wash['Address']]['Guests'][item] = quantity
+                names[wash['Name']]['Guests'][item] = quantity
         # If it is there already, add to the total for the apartment
         else:
             for item, quantity in wash['Items'].items():
-                if item not in addresses[wash['Address']]['Items'].keys():
-                    addresses[wash['Address']]['Items'][item] = quantity
+                if item not in names[wash['Name']]['Items'].keys():
+                    names[wash['Name']]['Items'][item] = quantity
                 else:
-                    addresses[wash['Address']]['Items'][item] += quantity
+                    names[wash['Name']]['Items'][item] += quantity
             for item, quantity in wash['Guests'].items():
-                if item not in addresses[wash['Address']]['Guests'].keys():
-                    addresses[wash['Address']]['Guests'][item] = quantity
+                if item not in names[wash['Name']]['Guests'].keys():
+                    names[wash['Name']]['Guests'][item] = quantity
                 else:
-                    addresses[wash['Address']]['Guests'][item] += quantity
-    return addresses
+                    names[wash['Name']]['Guests'][item] += quantity
+    return names
 
 def save(data):
     with open('apartments.json', 'w') as f:
         json.dump(data, f, indent = 4)
 
 def main():
-    save(group_by_address(load('washes.json')))
+    save(group_by_name(load('washes.json')))
