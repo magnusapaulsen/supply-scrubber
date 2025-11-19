@@ -155,25 +155,31 @@ def get_input(ui, apartment: str):
     if hasattr(ui['root'], 'wash_frame'):
         ui['root'].wash_frame.destroy()
 
-    frame = ctk.CTkFrame(ui['root'])
+    frame = ctk.CTkFrame(ui['root'], width = 400, height = 200, fg_color = '#333333')
     frame.pack(pady = 24)
     ui['root'].wash_frame = frame
 
-    question = ctk.CTkLabel(frame, text = f'How many times was {apartment} cleaned this month?', font = ctk.CTkFont(size = 12, weight = 'normal'))
+    question = ctk.CTkLabel(frame, text = f'How many times was {apartment} cleaned this month?', font = ctk.CTkFont(size = 12, weight = 'normal'), fg_color = 'transparent', text_color = '#ffffff', anchor = 'w')
     question.pack(side = 'left')
 
-    entry = ctk.CTkEntry(frame, width = 100, font = ctk.CTkFont(size = 12, weight = 'normal'))
+    entry = ctk.CTkEntry(frame, width = 50, font = ctk.CTkFont(size = 12, weight = 'normal'), fg_color = 'transparent', text_color = '#ffffff')
     entry.pack(side = 'left')
     entry.focus()
     entry.insert(0, '')
 
+    # I want to verify that the user put in a digit
     def on_enter(event = None):
-        try:
-            value = int(entry.get().strip() or '0')
-        except ValueError:
-            value = 0
-        update_queue.put(('answer', apartment, value))
-        frame.destroy()
+        while True:
+            try:
+                value = int(entry.get().strip() or '0')
+            except ValueError:
+                update_queue.put(('status', 'Invalid input, try again...'))
+                entry.delete(0, 'end')
+                entry.focus_set()
+            else:
+                update_queue.put(('answer', apartment, value))
+                frame.destroy()
+                break
 
     entry.bind('<Return>', on_enter)
 
