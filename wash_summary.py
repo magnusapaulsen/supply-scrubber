@@ -3,31 +3,31 @@ import json
 def load(fp):
     with open(fp, 'r', encoding='utf-8') as f:
         return json.load(f)
+    
+def prepare_data(apartments):
+    # Make list of all apartments
+    apts = []
+    for apt in apartments.keys():
+        apts.append(apt)
+    return apts
 
-def summarize_washes(apartments, price_list_apartments):
-    for name, data in apartments.items():
-        # Ensure 'Washes' exists
-        if 'Washes' not in data:
-            data['Washes'] = {}
+def finalize_data(apartments, summary, price_list_apartments):
+    for apt, quantity in summary.items():
+        if apt not in apartments:
+            continue
 
-        # Get the price for this apartment
-        price = price_list_apartments.get(name, 0)
-        data['Washes']['Price'] = price
+        if 'Washes' not in apartments[apt]:
+            apartments[apt]['Washes'] = {}
 
-        # Prompt the user for quantity
-        while True:
-            try:
-                quantity = int(input(f'How many times was {name} washed this month? '))
-                data['Washes']['Quantity'] = quantity
-            except ValueError:
-                print('You have to enter a number...')
-            else:
-                # Calculate total for this apartment
-                data['Washes']['Total'] = price * quantity
-                break
-    print('That was the last one!')
-
+        apartments[apt]['Washes']['Price'] = price_list_apartments[apt]
+        apartments[apt]['Washes']['Quantity'] = quantity
+        apartments[apt]['Washes']['Total'] = quantity * apartments[apt]['Washes']['Price']
+    
     return apartments
+
+def create_summary():
+    # I don't use this since I don't run this file from main()
+    pass
 
 def save(data, fp):
     with open(fp, 'w', encoding='utf-8') as f:
@@ -35,6 +35,6 @@ def save(data, fp):
 
 def main():
     apartments = load('apartments.json')
-    price_list_apartments = load('price_list_apartments.json')
-    updated_apartments = summarize_washes(apartments, price_list_apartments)
-    save(updated_apartments, 'apartments.json')
+    prepare_data(apartments)
+    finalized_data = finalize_data(apartments, create_summary(apartments), load('price_list_apartments.json'))
+    save(finalized_data, 'apartments.json')

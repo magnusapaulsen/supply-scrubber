@@ -35,8 +35,21 @@ def worker(ui):
         update_queue.put(('status', 'Grouping apartments...'))
         apartment_summary.main()
 
-        update_queue.put(('status', 'Waiting for input in terminal...'))
-        wash_summary.main()
+        update_queue.put(('status', 'Waiting for input...'))
+        apartments = wash_summary.load('apartments.json')
+        apts = wash_summary.prepare_data(apartments)
+        price_list_apartments = wash_summary.load('price_list_apartments.json')
+
+        summary = {}
+        for apt in apts:
+            ui['root'].after(0, lambda apartment = apt: get_input(ui, apartment))
+
+            while True:
+                msg = update_queue.get()
+                if msg[0] == 'answer' and msg[1] == apt:
+                    summary[apt] = msg[2]
+                    break
+        wash_summary.save(wash_summary.finalize_data(apartments, summary, price_list_apartments), 'apartments.json')
 
         update_queue.put(('status', 'Complete!', '#00ff00'))
 
@@ -137,6 +150,34 @@ def create_gui():
     ui['run'].pack(pady = 24)
 
     return root, ui
+
+def get_input(ui, apartment: str):
+    if hasattr(ui['root'], 'wash_frame'):
+        ui['root'].wash_frame.destroy()
+
+    frame = ctk.CTkFrame(ui['root'])
+    frame.pack(pady = 24)
+    ui['root'].wash_frame = frame
+
+    question = ctk.CTkLabel(frame, text = f'How many times was {apartment} cleaned this month?', font = ctk.CTkFont(size = 12, weight = 'normal'))
+    question.pack(side = 'left')
+
+    entry = ctk.CTkEntry(frame, width = 100, font = ctk.CTkFont(size = 12, weight = 'normal'))
+    entry.pack(side = 'left')
+    entry.focus()
+    entry.insert(0, '')
+
+    def on_enter(event = None):
+        try:
+            value = int(entry.get().strip() or '0')
+        except ValueError:
+            value = 0
+        update_queue.put(('answer', apartment, value))
+        frame.destroy()
+
+    entry.bind('<Return>', on_enter)
+
+    ui['root'].after(100, entry.focus_set)
 
 if __name__ == '__main__':
     root, ui = create_gui()

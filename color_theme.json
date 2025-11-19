@@ -6,7 +6,11 @@
     "fg_color": ["#ff0000", "#0000ff"]
   },
   "CTkFrame": {
-    "fg_color": ["#ff0000", "#0000ff"]
+    "fg_color": ["#333333", "#cccccc"],
+    "border_color": ["#000000", "ffffff"],
+    "text_color": ["#ffffff", "#000000"],
+    "corner_radius": 10,
+    "border_width": 0
   },
   "CTkButton": {
     "corner_radius": 10,
