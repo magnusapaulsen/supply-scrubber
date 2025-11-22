@@ -1,9 +1,9 @@
 import customtkinter as ctk
 import threading
 from tkinter import filedialog
+from CTkSpinbox import CTkSpinbox
 import queue
 import pdf_parser, calculate_total, apartment_summary, wash_summary
-import sys
 
 # Create queue for multithreading
 update_queue = queue.Queue()
@@ -97,8 +97,11 @@ def create_gui():
     # Create GUI window and set title, size and icon
     root = ctk.CTk()
     root.title('supply-scrubber')
-    root.geometry('600x460')
+    root.geometry('500x600')
     root.iconbitmap('icon.ico')
+
+    root.grid_rowconfigure(0, weight = 0)
+    root.grid_columnconfigure(0, weight = 1)
 
     # Create gui dictionary for widgets
     ui = {}
@@ -110,16 +113,16 @@ def create_gui():
         text = 'supply-scrubber',
         font = ctk.CTkFont(size = 24, weight = 'bold')
     )
-    ui['title'].pack(pady = 24)
+    ui['title'].grid(row = 0, column = 0, pady = 24)
 
-    # Add browse button to gui dictionary
-    ui['browse'] = ctk.CTkButton(
+    # Add select button to gui dictionary
+    ui['select'] = ctk.CTkButton(
         root,
         text = 'Select PDF',
         font = ctk.CTkFont(size = 12, weight = 'normal'),
         command = lambda: select_file(ui), # Lambda to not call the function immediately
     )
-    ui['browse'].pack(pady = 24)
+    ui['select'].grid(row = 1, column = 0, pady = 24)
 
     # Add file label to gui dictionary
     ui['file'] = ctk.CTkLabel(
@@ -127,7 +130,7 @@ def create_gui():
         text = 'No file selected',
         font = ctk.CTkFont(size = 12, weight = 'normal')
     )
-    ui['file'].pack(pady = 24)
+    ui['file'].grid(row = 2, column = 0, pady = 12)
 
     # Add status label to gui dictionary
     ui['status'] = ctk.CTkLabel(
@@ -135,7 +138,7 @@ def create_gui():
         text='',
         font = ctk.CTkFont(size = 12, weight = 'normal')
     )
-    ui['status'].pack(pady = 24)
+    ui['status'].grid(row = 3, column = 0, pady = 24)
 
     # Add run button to gui dictionary (starts disabled)
     ui['run'] = ctk.CTkButton(
@@ -147,7 +150,7 @@ def create_gui():
         command = lambda: run_in_thread(ui), # Lambda to not call the function immediately
         state = 'disabled'
     )
-    ui['run'].pack(pady = 24)
+    ui['run'].grid(row = 4, column = 0, pady = 12)
 
     return root, ui
 
@@ -155,35 +158,33 @@ def get_input(ui, apartment: str):
     if hasattr(ui['root'], 'wash_frame'):
         ui['root'].wash_frame.destroy()
 
-    frame = ctk.CTkFrame(ui['root'], width = 400, height = 200, fg_color = '#333333')
-    frame.pack(pady = 24)
+    frame = ctk.CTkFrame(ui['root'], fg_color = 'transparent', corner_radius = 10)
+    frame.grid(row = 5, column = 0, pady = 24)
     ui['root'].wash_frame = frame
+    
+    frame.grid_rowconfigure(0, weight = 0)
+    frame.grid_columnconfigure(0, weight = 1)
 
-    question = ctk.CTkLabel(frame, text = f'How many times was {apartment} cleaned this month?', font = ctk.CTkFont(size = 12, weight = 'normal'), fg_color = 'transparent', text_color = '#ffffff', anchor = 'w')
-    question.pack(side = 'left')
+    question = ctk.CTkLabel(frame, text = f'{apartment}', width = 192, height = 24, corner_radius = 10)
+    question.grid(row = 0, column = 0, pady = 6)
 
-    entry = ctk.CTkEntry(frame, width = 50, font = ctk.CTkFont(size = 12, weight = 'normal'), fg_color = 'transparent', text_color = '#ffffff')
-    entry.pack(side = 'left')
-    entry.focus()
-    entry.insert(0, '')
+    spinbox = CTkSpinbox(frame, width = 96, height = 48, start_value = 0, min_value = 0, max_value = 99, step_value = 1, scroll_value = 1, border_color = '#000000', font = ctk.CTkFont(size = 24, weight = 'normal'), fg_color = 'transparent', text_color = ('#000000', '#ffffff'), button_color = 'transparent', button_hover_color = ('#cccccc', '#333333'), button_border_color = ('#ffffff', '#000000'))
+    spinbox.grid(row = 1, column = 0, pady = 6)
+    spinbox.set(0)
+    spinbox.focus()
 
-    # I want to verify that the user put in a digit
-    def on_enter(event = None):
-        while True:
-            try:
-                value = int(entry.get().strip() or '0')
-            except ValueError:
-                update_queue.put(('status', 'Invalid input, try again...'))
-                entry.delete(0, 'end')
-                entry.focus_set()
-            else:
-                update_queue.put(('answer', apartment, value))
-                frame.destroy()
-                break
+    def submit(event = None):
+        value = int(spinbox.get() or 0)
+        update_queue.put(('answer', apartment, value))
+        frame.destroy()
 
-    entry.bind('<Return>', on_enter)
+    butt = ctk.CTkButton(frame, corner_radius = 10, fg_color = '#ff0000', hover_color = '#aa0000', text_color = '#ffffff', font = ctk.CTkFont(size = 12, weight = 'normal'), text = 'Submit', command = submit)
+    butt.grid(row = 2, column = 0, pady = 6)
 
-    ui['root'].after(100, entry.focus_set)
+    spinbox.focus_set()
+    ui['root'].after(100, spinbox.focus_set)
+
+    
 
 if __name__ == '__main__':
     root, ui = create_gui()

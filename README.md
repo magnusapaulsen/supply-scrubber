@@ -1,14 +1,21 @@
-# Supply-Scrubber
+# supply-scrubber
 
-A Python program leveraging pdfplumber and RegEx to parse PDF supply sheets, generating an overview of cleaning and restocking tasks for an AirBnB business.
+**A desktop tool that automates monthly cost reporting for an Airbnb business by parsing custom cleaning-company PDF invoices and generating structured, accountant-ready PDF overviews.**
 
 ## Features
-- Extracts apartment names, addresses, task names, dates, supply quantities and number of guests from PDF files.
-- Creates an overview for each wash in a month.
-- Creates a monthly overview for each apartment.
-- Saves result to JSON-files.
+- Parses PDF invoices using **pdfplumber** + **regex**
+- Extracts per-apartment restocking quantities, guest counts, and dates
+- Combines data with:
+  - Per-apartment number of cleanings entered by the user
+  - Per-apartment price lists (cleaning fees + individual supply items)
+- Calculates exact costs per stay and per month
+- Saves structured overviews as JSON (`washes.json`, `apartments.json`)
+- Generates a clean, multi-page PDF report (one page per apartment) ready for the accountant
 
-## Installation
+## Screenshots
+Coming soon...
+
+## Get started
 
 1. Clone the repository:
     git clone https://github.com/yourusername/supply-scrubber.git
@@ -18,16 +25,22 @@ A Python program leveraging pdfplumber and RegEx to parse PDF supply sheets, gen
     pip install -r requirements.txt
     *Note:* Ensure you have Python 3.8+ installed.
 
-## Usage
+3. Get price lists:
+    Place your JSON price lists (`price_list_items.json` & `price_list_apartments`) in the project directory.
+    (Example files will be included)
 
-1. Place your JSON price list (`price_list.json`) in the project directory.
-2. Run the script:
-    python main.py
-    python3 main.py
-3. Navigate the GUI to select PDF and run the parsing.
-4. View the results in the JSON files (`washes.json`, `apartments.json`)
+4. Run the script:
+    python main.py (python3 main.py)
+
+5. Navigate the GUI:
+    Select PDF.
+    Run parsing.
+    Generate PDF.
 
 ## Requirements
 - `pdfplumber`
+- `customtkinter`
+- `tkinter`
+- `reportlab`
 
 List of dependencies is in `requirements.txt`.

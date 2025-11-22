@@ -45,13 +45,16 @@ def generate_pdf(data, filename='apartments.pdf'):
     elements.append(title)
     
     # Date
-    date_text = Paragraph(f"Generated: {datetime.now().strftime('%B %d, %Y')}", 
-                         styles['Normal'])
+    date_text = Paragraph(f"Generated: {datetime.now().strftime('%B %d, %Y')}", styles['Normal'])
     elements.append(date_text)
     elements.append(Spacer(1, 1*cm))
     
     # Individual apartment sections
-    for apartment, details in data.items():
+    for i, (apartment, details) in enumerate(data.items()):
+        
+        if i > 0:
+            elements.append(PageBreak())
+
         # Apartment heading
         apt_heading = Paragraph(f"<b>{apartment}</b>", heading_style)
         elements.append(apt_heading)
@@ -67,22 +70,22 @@ def generate_pdf(data, filename='apartments.pdf'):
             
             items_data.append(['Total:', f'kr {items_total:,.2f}'])
             
-            items_table = Table(items_data, colWidths=[12*cm, 5*cm])
+            items_table = Table(items_data, colWidths=[14*cm, 3*cm])
             items_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3498DB')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#000000')),
+                ('BACKGROUND', (0, 1), (-1, -2), colors.HexColor('#333333')),
+                ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#ff0000')),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 10),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-                ('BACKGROUND', (0, 1), (-1, -2), colors.lightblue),
-                ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#AED6F1')),
-                ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey)
+                ('FONTNAME', (0, 1), (-1, 1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#ffffff')),
+                ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+                ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#111111'))
             ]))
             
             elements.append(items_table)
-            elements.append(Spacer(1, 0.3*cm))
+            elements.append(Spacer(1, 0.5*cm))
         
         # Guests table
         if "Guests" in details:
@@ -92,38 +95,37 @@ def generate_pdf(data, filename='apartments.pdf'):
                 [str(guests_data.get('Amount of Guests', 0)), f"kr {guests_data.get('Total', 0):,.2f}"]
             ]
             
-            guest_table = Table(guest_table_data, colWidths=[12*cm, 5*cm])
+            guest_table = Table(guest_table_data, colWidths=[14*cm, 3*cm])
             guest_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2ECC71')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#000000')),
+                ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#ff0000')),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTNAME', (0, -1), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#ffffff')),
                 ('ALIGN', (0, 0), (0, -1), 'LEFT'),
                 ('ALIGN', (1, 0), (1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 10),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.lightgreen),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey)
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#111111'))
             ]))
             
             elements.append(guest_table)
-            elements.append(Spacer(1, 0.3*cm))
+            elements.append(Spacer(1, 0.5*cm))
         
         # Total costs for this apartment
         items_total = details.get("Items", {}).get("Total", 0)
         guests_total = details.get("Guests", {}).get("Total", 0)
-        net_cost = items_total + guests_total
+        total = items_total + guests_total
         
-        total_data = [['Total cost:', f'kr {net_cost:,.2f}']]
-        total_table = Table(total_data, colWidths=[12*cm, 5*cm])
+        total_data = [['Total cost:', f'kr {total:,.2f}']]
+        total_table = Table(total_data, colWidths=[14*cm, 3*cm])
         total_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#F39C12')),
-            ('TEXTCOLOR', (0, 0), (-1, -1), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+            ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#ff0000')),
             ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 11),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-            ('TOPPADDING', (0, 0), (-1, -1), 8),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#ffffff')),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#111111'))
         ]))
         
         elements.append(total_table)
@@ -141,20 +143,20 @@ def generate_pdf(data, filename='apartments.pdf'):
                 ]
             ]
 
-            washes_table = Table(wash_table_data, colWidths=[7*cm, 5*cm, 5*cm])
+            washes_table = Table(wash_table_data, colWidths=[7*cm, 7*cm, 3*cm])
             washes_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3498DB')),  # Blue header
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#000000')),
+                ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#ff0000')),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 10),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.lightblue),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey)
+                ('FONTNAME', (0, -1), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#ffffff')),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#111111'))
             ]))
 
             elements.append(washes_table)
-            elements.append(Spacer(1, 0.3*cm))
+            elements.append(Spacer(1, 1*cm))
     
     # Build PDF
     doc.build(elements)

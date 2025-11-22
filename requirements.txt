@@ -1,1 +1,4 @@
 pdfplumber
+customtkinter
+reportlab
+CTkSpinbox
