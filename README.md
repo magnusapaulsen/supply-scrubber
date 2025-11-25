@@ -14,14 +14,16 @@
 
 ## Screenshots
 <div>
-
-  <img src="screenshots/screenshot1.png" width="15%"/>
-  <img src="screenshots/screenshot2.png" width="15%"/>
-  <img src="screenshots/screenshot3.png" width="15%"/>
-  <img src="screenshots/screenshot4.png" width="15%"/>
-  <img src="screenshots/screenshot5.png" width="15%"/>
-  <img src="screenshots/screenshot6.png" width="15%"/>
-
+  <img src="screenshots/screenshot1.png" width="45%"/>
+  <img src="screenshots/screenshot2.png" width="45%"/>
+</div>
+<div>
+  <img src="screenshots/screenshot3.png" width="45%"/>
+  <img src="screenshots/screenshot4.png" width="45%"/>
+</div>
+<div>
+  <img src="screenshots/screenshot5.png" width="45%"/>
+  <img src="screenshots/screenshot6.png" width="45%"/>
 </div>
 
 ## Get started
