@@ -1,8 +1,8 @@
-*.pdf
+data/*.pdf
 .DS_Store
 __pycache__
-price_list_apartments.json
-price_list_items.json
+data/price_list_apartments.json
+data/price_list_items.json
 washes.json
 apartments.json
 .venv
