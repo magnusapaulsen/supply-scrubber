@@ -1,8 +1,10 @@
 import customtkinter as ctk
 import threading
-from tkinter import filedialog
+from tkinter import filedialog, PhotoImage
 from CTkSpinbox import CTkSpinbox
 import queue
+import platform
+import os
 import pdf_parser, calculate_total, apartment_summary, wash_summary
 
 # Create queue for multithreading
@@ -98,7 +100,22 @@ def create_gui():
     root = ctk.CTk()
     root.title('supply-scrubber')
     root.geometry('500x600')
-    root.iconbitmap('data/icon.ico')
+
+    # Set icon
+    system = platform.system()
+    ico_path = 'data/icon.ico'
+    png_path = 'data/icon.png'
+
+    if system == 'Windows' and os.path.exists(ico_path):
+        root.iconbitmap(ico_path)
+    elif os.path.exists(png_path):
+        try:
+            img = PhotoImage(file=png_path)
+            root.iconphoto(True, img)
+        except Exception as e:
+            print(f'Could not load PNG icon: {e}')
+    else:
+        print('Something went wrong while trying to load icons...')
 
     root.grid_rowconfigure(0, weight = 0)
     root.grid_columnconfigure(0, weight = 1)
