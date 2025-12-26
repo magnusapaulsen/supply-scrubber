@@ -1,8 +1,10 @@
 import customtkinter as ctk
 import threading
-from tkinter import filedialog
+from tkinter import filedialog, PhotoImage
 from CTkSpinbox import CTkSpinbox
 import queue
+import platform
+import os
 import pdf_parser, calculate_total, apartment_summary, wash_summary
 
 # Create queue for multithreading
@@ -36,9 +38,9 @@ def worker(ui):
         apartment_summary.main()
 
         update_queue.put(('status', 'Waiting for input...'))
-        apartments = wash_summary.load('apartments.json')
+        apartments = wash_summary.load('data/apartments.json')
         apts = wash_summary.prepare_data(apartments)
-        price_list_apartments = wash_summary.load('price_list_apartments.json')
+        price_list_apartments = wash_summary.load('data/price_list_apartments.json')
 
         summary = {}
         for apt in apts:
@@ -49,7 +51,7 @@ def worker(ui):
                 if msg[0] == 'answer' and msg[1] == apt:
                     summary[apt] = msg[2]
                     break
-        wash_summary.save(wash_summary.finalize_data(apartments, summary, price_list_apartments), 'apartments.json')
+        wash_summary.save(wash_summary.finalize_data(apartments, summary, price_list_apartments), 'data/apartments.json')
 
         update_queue.put(('status', 'Complete!', '#00ff00'))
 
@@ -92,13 +94,28 @@ def check_queue(ui):
 def create_gui():
     # Set color mode and color theme
     ctk.set_appearance_mode('Dark') # 'Dark', 'Light' or 'System'
-    ctk.set_default_color_theme('color_theme.json')
+    ctk.set_default_color_theme('data/color_theme.json')
 
     # Create GUI window and set title, size and icon
     root = ctk.CTk()
     root.title('supply-scrubber')
     root.geometry('500x600')
-    root.iconbitmap('icon.ico')
+
+    # Set icon
+    system = platform.system()
+    ico_path = 'data/icon.ico'
+    png_path = 'data/icon.png'
+
+    if system == 'Windows' and os.path.exists(ico_path):
+        root.iconbitmap(ico_path)
+    elif os.path.exists(png_path):
+        try:
+            img = PhotoImage(file=png_path)
+            root.iconphoto(True, img)
+        except Exception as e:
+            print(f'Could not load PNG icon: {e}')
+    else:
+        print('Something went wrong while trying to load icons...')
 
     root.grid_rowconfigure(0, weight = 0)
     root.grid_columnconfigure(0, weight = 1)

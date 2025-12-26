@@ -39,7 +39,7 @@ def parse_pdf(fp):
 
 def save_pdf(washes):
     print('Saving...')
-    with open('washes.json', 'w') as f:
+    with open('data/washes.json', 'w') as f:
         json.dump(washes, f, indent = 4)
     print('Saved!')
 

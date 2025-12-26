@@ -1,4 +1,4 @@
-pdfplumber
-customtkinter
-reportlab
-CTkSpinbox
+CTkSpinbox==1.4.1
+customtkinter==5.2.2
+pdfplumber==0.11.8
+reportlab==4.4.7

@@ -34,7 +34,7 @@ def save(data, fp):
         json.dump(data, f, indent=4)
 
 def main():
-    apartments = load('apartments.json')
+    apartments = load('data/apartments.json')
     prepare_data(apartments)
-    finalized_data = finalize_data(apartments, create_summary(apartments), load('price_list_apartments.json'))
-    save(finalized_data, 'apartments.json')
+    finalized_data = finalize_data(apartments, create_summary(apartments), load('data/price_list_apartments.json'))
+    save(finalized_data, 'data/apartments.json')
