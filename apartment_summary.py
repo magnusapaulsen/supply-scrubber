@@ -31,8 +31,8 @@ def group_by_name(washes):
     return names
 
 def save(data):
-    with open('apartments.json', 'w') as f:
+    with open('data/apartments.json', 'w') as f:
         json.dump(data, f, indent = 4)
 
 def main():
-    save(group_by_name(load('washes.json')))
+    save(group_by_name(load('data/washes.json')))

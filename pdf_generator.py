@@ -11,7 +11,7 @@ def load(fp):
     with open(fp, 'r') as f:
         return json.load(f)
 
-def generate_pdf(data, filename='apartments.pdf'):
+def generate_pdf(data, filename='data/apartments.pdf'):
     # Create PDF document
     doc = SimpleDocTemplate(filename, pagesize=A4,
                            rightMargin=2*cm, leftMargin=2*cm,
@@ -163,10 +163,10 @@ def generate_pdf(data, filename='apartments.pdf'):
     print(f"PDF successfully created: {filename}")
 
 def main():
-    data = load('apartments.json')
-    generate_pdf(data, 'apartments.pdf')
+    data = load('data/apartments.json')
+    generate_pdf(data, 'data/apartments.pdf')
 
 # Main execution
 if __name__ == "__main__":
-    data = load('apartments.json')
-    generate_pdf(data, 'apartments.pdf')
+    data = load('data/apartments.json')
+    generate_pdf(data, 'data/apartments.pdf')

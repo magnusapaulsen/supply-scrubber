@@ -36,9 +36,9 @@ def worker(ui):
         apartment_summary.main()
 
         update_queue.put(('status', 'Waiting for input...'))
-        apartments = wash_summary.load('apartments.json')
+        apartments = wash_summary.load('data/apartments.json')
         apts = wash_summary.prepare_data(apartments)
-        price_list_apartments = wash_summary.load('price_list_apartments.json')
+        price_list_apartments = wash_summary.load('data/price_list_apartments.json')
 
         summary = {}
         for apt in apts:
@@ -49,7 +49,7 @@ def worker(ui):
                 if msg[0] == 'answer' and msg[1] == apt:
                     summary[apt] = msg[2]
                     break
-        wash_summary.save(wash_summary.finalize_data(apartments, summary, price_list_apartments), 'apartments.json')
+        wash_summary.save(wash_summary.finalize_data(apartments, summary, price_list_apartments), 'data/apartments.json')
 
         update_queue.put(('status', 'Complete!', '#00ff00'))
 
@@ -92,13 +92,13 @@ def check_queue(ui):
 def create_gui():
     # Set color mode and color theme
     ctk.set_appearance_mode('Dark') # 'Dark', 'Light' or 'System'
-    ctk.set_default_color_theme('color_theme.json')
+    ctk.set_default_color_theme('data/color_theme.json')
 
     # Create GUI window and set title, size and icon
     root = ctk.CTk()
     root.title('supply-scrubber')
     root.geometry('500x600')
-    root.iconbitmap('icon.ico')
+    root.iconbitmap('data/icon.ico')
 
     root.grid_rowconfigure(0, weight = 0)
     root.grid_columnconfigure(0, weight = 1)
