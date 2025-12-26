@@ -1,4 +1,13 @@
-pdfplumber
-customtkinter
-reportlab
-CTkSpinbox
+cffi==2.0.0
+charset-normalizer==3.4.4
+cryptography==46.0.3
+CTkSpinbox==1.4.1
+customtkinter==5.2.2
+darkdetect==0.8.0
+packaging==25.0
+pdfminer.six==20251107
+pdfplumber==0.11.8
+pillow==12.0.0
+pycparser==2.23
+pypdfium2==5.2.0
+reportlab==4.4.7
