@@ -29,16 +29,16 @@
 ## Get started
 
 1. Clone the repository:
-    git clone https://github.com/yourusername/supply-scrubber.git
+    git clone https://github.com/magnusapaulsen/supply-scrubber.git
     cd supply-scrubber
 
 2. Install dependencies:
-    pip install -r requirements.txt
+    pip install -r requirements.txt (pip3 install -r)
     *Note:* Ensure you have Python 3.8+ installed.
 
 3. Get price lists:
-    Place your JSON price lists (`price_list_items.json` & `price_list_apartments`) in the project directory.
-    (Example files will be included)
+    Place your JSON price lists (`price_list_items.json` & `price_list_apartments`) inside the data folder of the project directory.
+    (Example files are included)
 
 4. Run the script:
     python main.py (python3 main.py)
@@ -46,12 +46,15 @@
 5. Navigate the GUI:
     Select PDF.
     Run parsing.
-    Generate PDF.
+    Fill in number of cleanings.
+
+6. Run the PDF generator:
+    python pdf_generator.py (python3 pdf_generator.py)
 
 ## Requirements
-- `pdfplumber`
+- `CTkSpinbox`
 - `customtkinter`
-- `tkinter`
+- `pdfplumber`
 - `reportlab`
 
 List of dependencies is in `requirements.txt`.
