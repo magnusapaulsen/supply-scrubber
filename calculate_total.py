@@ -1,8 +1,4 @@
-import json
-
-def load(fp):
-    with open(fp, 'r') as f:
-        return json.load(f)
+from utils import load, save
 
 def calculate_total(washes, price_list_items):
     # Loop through all washes
@@ -24,10 +20,6 @@ def calculate_total(washes, price_list_items):
             wash['Guests']['Total'] = total
 
     return washes
-
-def save(data, fp):
-    with open(fp, 'w') as f:
-        json.dump(data, f, indent = 4)
 
 def main():
     save(calculate_total(load('data/washes.json'), load('data/price_list_items.json')), 'data/washes.json')

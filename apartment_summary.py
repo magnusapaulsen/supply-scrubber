@@ -1,8 +1,4 @@
-import json
-
-def load(fp):
-    with open(fp, 'r') as f:
-        return json.load(f)
+from utils import load, save
 
 def group_by_name(washes):
     # Create an overview of the washes for each apartment
@@ -30,9 +26,5 @@ def group_by_name(washes):
                     names[wash['Name']]['Guests'][item] += quantity
     return names
 
-def save(data):
-    with open('data/apartments.json', 'w') as f:
-        json.dump(data, f, indent = 4)
-
 def main():
-    save(group_by_name(load('data/washes.json')))
+    save(group_by_name(load('data/washes.json')), 'data/apartments.json')

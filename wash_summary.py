@@ -1,8 +1,4 @@
-import json
-
-def load(fp):
-    with open(fp, 'r', encoding='utf-8') as f:
-        return json.load(f)
+from utils import load, save
     
 def prepare_data(apartments):
     # Make list of all apartments
@@ -28,10 +24,6 @@ def finalize_data(apartments, summary, price_list_apartments):
 def create_summary():
     # I don't use this since I don't run this file from main()
     pass
-
-def save(data, fp):
-    with open(fp, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=4)
 
 def main():
     apartments = load('data/apartments.json')

@@ -1,4 +1,3 @@
-import json
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -6,10 +5,7 @@ from reportlab.lib.units import cm
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT
 from datetime import datetime
-
-def load(fp):
-    with open(fp, 'r') as f:
-        return json.load(f)
+from utils import load
 
 def generate_pdf(data, filename='data/apartments.pdf'):
     # Create PDF document

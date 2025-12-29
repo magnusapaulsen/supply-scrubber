@@ -1,4 +1,5 @@
-import pdfplumber, re, json
+import pdfplumber, re
+from utils import save
 
 def parse_pdf(fp):
     print('Opening the PDF...')
@@ -37,11 +38,5 @@ def parse_pdf(fp):
             page_count += 1
     return washes
 
-def save_pdf(washes):
-    print('Saving...')
-    with open('data/washes.json', 'w') as f:
-        json.dump(washes, f, indent = 4)
-    print('Saved!')
-
 def main(fp):
-    save_pdf(parse_pdf(fp))
+    save(parse_pdf(fp), 'data/washes.json')
