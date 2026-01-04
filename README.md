@@ -29,11 +29,19 @@
 ## Get started
 
 1. Clone the repository:
-    git clone https://github.com/magnusapaulsen/supply-scrubber.git
-    cd supply-scrubber
-
+	```bash
+	git clone https://github.com/magnusapaulsen/supply-scrubber.git
+	```
+ 
+	```bash
+ 	cd supply-scrubber
+ 	```
+  
 2. Install dependencies:
-    pip install -r requirements.txt (pip3 install -r)
+	```bash
+	pip install -r requirements.txt
+ 	```
+ 
     *Note:* Ensure you have Python 3.8+ installed.
 
 3. Get price lists:
@@ -41,16 +49,20 @@
     (Example files are included)
 
 4. Run the script:
-    python main.py (python3 main.py)
-
+    ```bash
+    python main.py
+    ```
+    
 5. Navigate the GUI:
     Select PDF.
     Run parsing.
     Fill in number of cleanings.
 
 6. Run the PDF generator:
-    python pdf_generator.py (python3 pdf_generator.py)
-
+    ```bash
+    python pdf_generator.py
+    ```
+     
 ## Requirements
 - `CTkSpinbox`
 - `customtkinter`
