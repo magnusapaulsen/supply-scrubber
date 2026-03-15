@@ -5,11 +5,7 @@ def load(fp):
         return json.load(f)
     
 def prepare_data(apartments):
-    # Make list of all apartments
-    apts = []
-    for apt in apartments.keys():
-        apts.append(apt)
-    return apts
+    return list(apartments)
 
 def finalize_data(apartments, summary, price_list_apartments):
     for apt, quantity in summary.items():

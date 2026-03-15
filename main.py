@@ -5,7 +5,7 @@ from CTkSpinbox import CTkSpinbox
 import queue
 import platform
 import os
-import pdf_parser, calculate_total, apartment_summary, wash_summary
+import pdf_parser, calculate_total, apartment_summary, wash_summary, pdf_generator
 
 # Create queue for multithreading
 update_queue = queue.Queue()
@@ -54,11 +54,10 @@ def worker(ui):
         wash_summary.save(wash_summary.finalize_data(apartments, summary, price_list_apartments), 'data/apartments.json')
 
         update_queue.put(('status', 'Complete!', '#00ff00'))
+        update_queue.put(('show_generate',))
 
     except Exception as e:
         update_queue.put(('status', f'Error: {e}', '#ff4444'))
-    finally:
-        update_queue.put(('exit',)) # Sending message to close the program
 
 def run_in_thread(ui):
     ui['run'].configure(
@@ -82,8 +81,11 @@ def check_queue(ui):
             elif msg[0] == 'enable_button':
                 ui['run'].configure(state = 'normal', fg_color = '#1f6aa5')
                 return
+            elif msg[0] == 'show_generate':
+                ui['root'].after(0, lambda: show_generate_button(ui))
+                return
             elif msg[0] == 'exit':
-                ui['root'].after(3000, ui['root'].destroy) # Close the program
+                ui['root'].after(3000, ui['root'].destroy)
                 return
     except queue.Empty:
         pass
@@ -171,6 +173,30 @@ def create_gui():
 
     return root, ui
 
+def show_generate_button(ui):
+    btn = ctk.CTkButton(
+        ui['root'],
+        text = 'Generate PDF',
+        fg_color = '#ff0000',
+        hover_color = '#aa0000',
+        text_color = '#ffffff',
+        font = ctk.CTkFont(size = 12, weight = 'normal'),
+        command = lambda: run_generate_pdf(btn)
+    )
+    btn.grid(row = 5, column = 0, pady = 12)
+
+def run_generate_pdf(btn):
+    btn.configure(state = 'disabled', text = 'Generating...')
+    def run():
+        try:
+            pdf_generator.main()
+            update_queue.put(('status', 'PDF saved!', '#00ff00'))
+        except Exception as e:
+            update_queue.put(('status', f'Error: {e}', '#ff4444'))
+        finally:
+            update_queue.put(('exit',))
+    threading.Thread(target = run, daemon = True).start()
+
 def get_input(ui, apartment: str):
     if hasattr(ui['root'], 'wash_frame'):
         ui['root'].wash_frame.destroy()
@@ -191,15 +217,19 @@ def get_input(ui, apartment: str):
     spinbox.focus()
 
     def submit(event = None):
+        ui['root'].unbind('<Return>')
+        ui['root'].unbind('<Left>')
+        ui['root'].unbind('<Right>')
         value = int(spinbox.get() or 0)
         update_queue.put(('answer', apartment, value))
         frame.destroy()
 
+    ui['root'].bind('<Return>', submit)
+    ui['root'].bind('<Left>', lambda _: spinbox.decrement_counter())
+    ui['root'].bind('<Right>', lambda _: spinbox.increment_counter())
+
     butt = ctk.CTkButton(frame, corner_radius = 10, fg_color = '#ff0000', hover_color = '#aa0000', text_color = '#ffffff', font = ctk.CTkFont(size = 12, weight = 'normal'), text = 'Submit', command = submit)
     butt.grid(row = 2, column = 0, pady = 6)
-
-    spinbox.focus_set()
-    ui['root'].after(100, spinbox.focus_set)
 
     
 
