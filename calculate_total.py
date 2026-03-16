@@ -8,18 +8,18 @@ def calculate_total(washes, price_list_items):
     # Loop through all washes
     for wash in washes:
         # Add total cost of items
-        if 'Total' not in wash['Items'].keys():
+        if 'Total' not in wash['Items']:
             total = 0
             for item, quantity in wash['Items'].items():
-                if item in price_list_items.keys():
+                if item in price_list_items:
                     total += quantity * price_list_items[item]
             wash['Items']['Total'] = total
 
         # Add total number of guests
-        if 'Total' not in wash['Guests'].keys():
+        if 'Total' not in wash['Guests']:
             total = 0
             for item, quantity in wash['Guests'].items():
-                if item in price_list_items.keys():
+                if item in price_list_items:
                     total += quantity * price_list_items[item]
             wash['Guests']['Total'] = total
 
