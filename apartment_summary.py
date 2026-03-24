@@ -1,24 +1,46 @@
-import json
-from collections import Counter
+from utils import normalize_price_list
 
-def load(fp):
-    with open(fp, 'r') as f:
-        return json.load(f)
+def process_washes(washes, price_list_items):
+    prices = normalize_price_list(price_list_items)
+    apartments = {}
 
-def group_by_name(washes):
-    # Create an overview of the washes for each apartment
-    names = {}
     for wash in washes:
         name = wash['Name']
-        if name not in names:
-            names[name] = {'Items': Counter(), 'Guests': Counter(), 'Washes': {}}
-        names[name]['Items'].update(wash['Items'])
-        names[name]['Guests'].update(wash['Guests'])
-    return names
 
-def save(data):
-    with open('data/apartments.json', 'w') as f:
-        json.dump(data, f, indent = 4)
+        # Calculate items total for this wash
+        items_total = 0
+        for item, quantity in wash['Items'].items():
+            key = item.casefold()
+            if key in prices:
+                items_total += quantity * prices[key]
+        items_total = round(items_total, 2)
 
-def main():
-    save(group_by_name(load('data/washes.json')))
+        # Calculate guests total for this wash
+        guests_total = 0
+        for guest_key, quantity in wash['Guests'].items():
+            key = guest_key.casefold()
+            if key in prices:
+                guests_total += quantity * prices[key]
+        guests_total = round(guests_total, 2)
+
+        # Group by apartment name
+        if name not in apartments:
+            apartments[name] = {'Items': {}, 'Guests': {}, 'Washes': {}}
+
+        # Accumulate item quantities
+        for item, quantity in wash['Items'].items():
+            apartments[name]['Items'][item] = apartments[name]['Items'].get(item, 0) + quantity
+
+        # Accumulate guest counts
+        for guest_key, quantity in wash['Guests'].items():
+            apartments[name]['Guests'][guest_key] = apartments[name]['Guests'].get(guest_key, 0) + quantity
+
+        # Accumulate totals
+        apartments[name]['Items']['Total'] = round(
+            apartments[name]['Items'].get('Total', 0) + items_total, 2
+        )
+        apartments[name]['Guests']['Total'] = round(
+            apartments[name]['Guests'].get('Total', 0) + guests_total, 2
+        )
+
+    return apartments

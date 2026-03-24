@@ -1,4 +1,8 @@
-import fitz, re, json
+import fitz, re
+
+TASK_PATTERN = re.compile(r'Task Name\s+(.+)')
+DATE_PATTERN = re.compile(r'Due Date\s+(.+)')
+ITEM_PATTERN = re.compile(r'☐\s+(.+?)\s+(\d+)\s*$', re.MULTILINE)
 
 def parse_pdf(fp):
     print('Opening the PDF...')
@@ -16,16 +20,15 @@ def parse_pdf(fp):
         # Create new dictionary using RegEx
         wash['Name'] = lines[1]
         wash['Address'] = lines[2]
-        task_match = re.search(r'Task Name\s+(.+)', text)
+        task_match = TASK_PATTERN.search(text)
         if task_match:
             wash['Task'] = task_match.group(1)
-        date_match = re.search(r'Due Date\s+(.+)', text)
+        date_match = DATE_PATTERN.search(text)
         if date_match:
             wash['Date'] = date_match.group(1)
         wash['Items'] = {}
         wash['Guests'] = {}
-        matches = re.findall(r'☐\s+(.+?)\s+(\d+)\s*$', text, re.MULTILINE)
-        for item_name, quantity in matches:
+        for item_name, quantity in ITEM_PATTERN.findall(text):
             if 'Amount of Guests' in item_name:
                 wash['Guests']['Amount of Guests'] = int(quantity)
             else:
@@ -35,11 +38,5 @@ def parse_pdf(fp):
         print(f'Finished page {page_count}')
     return washes
 
-def save_pdf(washes):
-    print('Saving...')
-    with open('data/washes.json', 'w') as f:
-        json.dump(washes, f, indent = 4)
-    print('Saved!')
-
 def main(fp):
-    save_pdf(parse_pdf(fp))
+    return parse_pdf(fp)

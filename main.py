@@ -5,7 +5,9 @@ from CTkSpinbox import CTkSpinbox
 import queue
 import platform
 import os
-import pdf_parser, calculate_total, apartment_summary, wash_summary, pdf_generator
+import pdf_parser, apartment_summary, wash_summary, pdf_generator
+from utils import load, save
+from paths import get_asset_path, get_data_path
 
 # Create queue for multithreading
 update_queue = queue.Queue()
@@ -29,18 +31,15 @@ def worker(ui):
             return
 
         update_queue.put(('status', 'Parsing PDF...'))
-        pdf_parser.main(selected_file)
+        washes = pdf_parser.main(selected_file)
 
         update_queue.put(('status', 'Calculating totals...'))
-        calculate_total.main()
-
-        update_queue.put(('status', 'Grouping apartments...'))
-        apartment_summary.main()
+        price_list_items = load(get_data_path('data/price_list_items.json'))
+        apartments = apartment_summary.process_washes(washes, price_list_items)
 
         update_queue.put(('status', 'Waiting for input...'))
-        apartments = wash_summary.load('data/apartments.json')
-        apts = wash_summary.prepare_data(apartments)
-        price_list_apartments = wash_summary.load('data/price_list_apartments.json')
+        apts = list(apartments)
+        price_list_apartments = load(get_data_path('data/price_list_apartments.json'))
 
         summary = {}
         for apt in apts:
@@ -51,7 +50,8 @@ def worker(ui):
                 if msg[0] == 'answer' and msg[1] == apt:
                     summary[apt] = msg[2]
                     break
-        wash_summary.save(wash_summary.finalize_data(apartments, summary, price_list_apartments), 'data/apartments.json')
+        apartments = wash_summary.finalize_data(apartments, summary, price_list_apartments)
+        save(apartments, get_data_path('data/apartments.json'))
 
         update_queue.put(('status', 'Complete!', '#00ff00'))
         update_queue.put(('show_generate',))
@@ -80,13 +80,10 @@ def check_queue(ui):
                 ui['status'].configure(text = text, text_color = color)
             elif msg[0] == 'enable_button':
                 ui['run'].configure(state = 'normal', fg_color = '#1f6aa5')
-                return
             elif msg[0] == 'show_generate':
                 ui['root'].after(0, lambda: show_generate_button(ui))
-                return
-            elif msg[0] == 'exit':
-                ui['root'].after(3000, ui['root'].destroy)
-                return
+            elif msg[0] == 'show_open':
+                ui['root'].after(0, lambda: show_open_button(ui, msg[1]))
     except queue.Empty:
         pass
 
@@ -96,7 +93,7 @@ def check_queue(ui):
 def create_gui():
     # Set color mode and color theme
     ctk.set_appearance_mode('Dark') # 'Dark', 'Light' or 'System'
-    ctk.set_default_color_theme('data/color_theme.json')
+    ctk.set_default_color_theme(get_asset_path('data/color_theme.json'))
 
     # Create GUI window and set title, size and icon
     root = ctk.CTk()
@@ -105,8 +102,8 @@ def create_gui():
 
     # Set icon
     system = platform.system()
-    ico_path = 'data/icon.ico'
-    png_path = 'data/icon.png'
+    ico_path = get_asset_path('data/icon.ico')
+    png_path = get_asset_path('data/icon.png')
 
     if system == 'Windows' and os.path.exists(ico_path):
         root.iconbitmap(ico_path)
@@ -185,16 +182,28 @@ def show_generate_button(ui):
     )
     btn.grid(row = 5, column = 0, pady = 12)
 
+def show_open_button(ui, pdf_path):
+    btn = ctk.CTkButton(
+        ui['root'],
+        text = 'Open PDF',
+        fg_color = '#ff0000',
+        hover_color = '#aa0000',
+        text_color = '#ffffff',
+        font = ctk.CTkFont(size = 12, weight = 'normal'),
+        command = lambda: os.startfile(pdf_path)
+    )
+    btn.grid(row = 6, column = 0, pady = 12)
+
 def run_generate_pdf(btn):
     btn.configure(state = 'disabled', text = 'Generating...')
     def run():
         try:
+            pdf_path = get_data_path('data/apartments.pdf')
             pdf_generator.main()
             update_queue.put(('status', 'PDF saved!', '#00ff00'))
+            update_queue.put(('show_open', pdf_path))
         except Exception as e:
             update_queue.put(('status', f'Error: {e}', '#ff4444'))
-        finally:
-            update_queue.put(('exit',))
     threading.Thread(target = run, daemon = True).start()
 
 def get_input(ui, apartment: str):

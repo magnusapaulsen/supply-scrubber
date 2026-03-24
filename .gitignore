@@ -7,3 +7,8 @@ washes.json
 apartments.json
 .venv
 venv
+.claude
+build
+dist
+*.spec
+supply_scrubber.spec
