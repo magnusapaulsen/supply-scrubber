@@ -3,7 +3,7 @@
 **A desktop tool that automates monthly cost reporting for an Airbnb business by parsing custom cleaning-company PDF invoices and generating structured, accountant-ready PDF overviews.**
 
 ## Features
-- Parses PDF invoices using **pdfplumber** + **regex**
+- Parses PDF invoices using **PyMuPDF** + **regex**
 - Extracts per-apartment restocking quantities, guest counts, and dates
 - Combines data with:
   - Per-apartment number of cleanings entered by the user
@@ -53,17 +53,13 @@
 5. Navigate the GUI:
     Select PDF.
     Run parsing.
-    Fill in number of cleanings.
-
-6. Run the PDF generator:
-    ```bash
-    python pdf_generator.py
-    ```
+    Fill in number of cleanings (arrow keys and enter work too).
+    Click 'Generate PDF' once it appears.
      
 ## Requirements
 - `CTkSpinbox`
 - `customtkinter`
-- `pdfplumber`
+- `pymupdf`
 - `reportlab`
 
 List of dependencies is in `requirements.txt`.
