@@ -1,4 +1,4 @@
-import fitz, re, json
+import pymupdf as fitz, re, json
 
 def parse_pdf(fp):
     print('Opening the PDF...')
