@@ -65,10 +65,10 @@
 To run the full pipeline on an invoice and produce the final report PDF directly:
 
 ```bash
-python main.py --pdf /path/to/invoice.pdf
+python main.py --pdf /path/to/invoice.pdf --out /path/to/output.pdf
 ```
 
-This parses the PDF, calculates totals, groups apartments, assigns one wash per parsed wash, and writes the finished PDF to `data/apartments.pdf`. No interactive input is required. This is the mode an LLM agent would use to fulfill a request like "take this invoice and use supply-scrubber to generate a PDF for my accountant."
+This parses the PDF, calculates totals, groups apartments, assigns one wash per parsed wash, and writes the finished PDF (default: `data/apartments.pdf`, override with `--out`). No interactive input is required. This is the mode an LLM agent would use to fulfill a request like "take this invoice and use supply-scrubber to generate a PDF for my accountant."
 
 ## Testing
 
@@ -78,11 +78,22 @@ python -m pytest
 
 The test suite covers the calculation, grouping, and finalize logic, plus PDF generation. All tests run without the GUI or a display server.
      
+## Packaging (PyInstaller)
+
+To build a standalone executable (no Python install needed on the target machine):
+
+```bash
+pyinstaller supply-scrubber.spec
+```
+
+Produces a binary at `dist/main`. The `data/` folder (icons, theme, price lists) is bundled at build time.
+
 ## Requirements
 - `CTkSpinbox`
 - `customtkinter`
 - `pymupdf`
 - `reportlab`
 - `pytest` (for running the test suite)
+- `pyinstaller` (for building the standalone executable)
 
 List of dependencies is in `requirements.txt`.

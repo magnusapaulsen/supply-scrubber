@@ -8,7 +8,8 @@ Single-package Python desktop app (flat layout, no monorepo) that parses cleanin
 
 - Setup: `pip install -r requirements.txt`
 - Run (GUI): `python main.py`
-- Run (automatic/CLI): `python main.py --pdf <invoice.pdf>` — runs the full pipeline automatically and writes the report PDF to `data/apartments.pdf`
+- Run (automatic/CLI): `python main.py --pdf <invoice.pdf> [--out <output.pdf>]` — runs the full pipeline automatically; writes report PDF to `data/apartments.pdf` by default
+- Package: `pyinstaller supply-scrubber.spec` → binary at `dist/main`
 - Test: `python -m pytest` (from repo root; requires `pip install -r requirements.txt`)
 
 There is no linter, typechecker, build step, CI, or task runner configured. No automated verification beyond the pytest suite exists; use `python -m py_compile <file>` for a syntax check.
@@ -27,6 +28,7 @@ There is no linter, typechecker, build step, CI, or task runner configured. No a
 - Parsing depends on exact invoice text layout via regex (`Task Name`, `Due Date`, checkbox lines `☐  <item>  <qty>`, `Name`/`Address` from line positions). Formatting changes in invoices will break parsing — update regexes accordingly.
 - Uses PyMuPDF (`import pymupdf as fitz`); last commit notes a switch away from pdfplumber due to fitz issues.
 - Per-apartment interactive input: arrow keys/Enter on the spinbox; `Return`/`Left`/`Right` key bindings on the root window.
+- Automatic mode exits with code 1 and logs a clean error if the invoice PDF or price lists are missing.
 
 ## Out of scope for agents
 

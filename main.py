@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import platform
+import sys
 
 import customtkinter as ctk
 import queue
@@ -248,9 +249,16 @@ def get_input(ui, apartment: str):
     butt = ctk.CTkButton(frame, corner_radius = 10, fg_color = '#ff0000', hover_color = '#aa0000', text_color = '#ffffff', font = ctk.CTkFont(size = 12, weight = 'normal'), text = 'Submit', command = submit)
     butt.grid(row = 2, column = 0, pady = 6)
 
-def run_cli(pdf_path):
+def run_cli(pdf_path, out_path=paths.PDF_PATH):
     # Automatic mode: parse the given invoice and generate the report PDF without the GUI
     logger.info('Running automatic report pipeline for: %s', pdf_path)
+    if not os.path.exists(pdf_path):
+        raise FileNotFoundError(f'Invoice PDF not found: {pdf_path}')
+
+    missing = [str(p) for p in (paths.PRICE_LIST_ITEMS_PATH, paths.PRICE_LIST_APARTMENTS_PATH) if not os.path.exists(p)]
+    if missing:
+        raise FileNotFoundError('Missing required file(s): ' + ', '.join(missing))
+
     washes = pdf_parser.parse_pdf(pdf_path)
     price_list_items = calculate_total.load(paths.PRICE_LIST_ITEMS_PATH)
     washes = calculate_total.calculate_total(washes, price_list_items)
@@ -265,16 +273,21 @@ def run_cli(pdf_path):
 
     finalized = wash_summary.finalize_data(grouped, summary, wash_summary.load(paths.PRICE_LIST_APARTMENTS_PATH))
     wash_summary.save(finalized, paths.APARTMENTS_PATH)
-    pdf_generator.generate_pdf(finalized, paths.PDF_PATH)
-    logger.info('PDF successfully created: %s', paths.PDF_PATH)
+    pdf_generator.generate_pdf(finalized, out_path)
+    logger.info('PDF successfully created: %s', out_path)
 
 def main():
     parser = argparse.ArgumentParser(description = 'supply-scrubber - desktop tool that generates accountant-ready PDF cleaning cost reports from cleaning company invoices.')
-    parser.add_argument('--pdf', type = str, help = 'Path to a cleaning invoice PDF. When given, runs the full pipeline automatically and generates the report PDF (data/apartments.pdf) without opening the GUI.')
+    parser.add_argument('--pdf', type = str, help = 'Path to a cleaning invoice PDF. When given, runs the full pipeline automatically and generates the report PDF without opening the GUI.')
+    parser.add_argument('--out', type = str, default = paths.PDF_PATH, help = 'Output PDF path (default: data/apartments.pdf).')
     args = parser.parse_args()
 
     if args.pdf:
-        run_cli(args.pdf)
+        try:
+            run_cli(args.pdf, args.out)
+        except Exception:
+            logger.exception('Automatic pipeline failed')
+            sys.exit(1)
     else:
         root, ui = create_gui()
         root.mainloop()
