@@ -29,6 +29,12 @@ There is no linter, typechecker, or CI configured. Automated verification is the
 - Per-apartment interactive input: arrow keys/Enter on the spinbox; `Return`/`Left`/`Right` key bindings on the root window.
 - Automatic mode exits with code 1 and logs a clean error if the invoice PDF or price lists are missing.
 
+## Design
+
+- Minimalist design: simple, no flashy elements, no gradients/shadows/animations unless asked.
+- Color scheme: black, red, white (GUI red accents via customtkinter; dark theme in `data/color_theme.json`).
+- Keep new UI minimal and consistent with the existing look; do not add extra colors or styling unprompted.
+
 ## Out of scope for agents
 
 - No linter/typechecker/CI configured.
