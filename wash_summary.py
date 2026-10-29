@@ -1,11 +1,19 @@
 import json
+import logging
 
-def load(fp):
-    with open(fp, 'r', encoding='utf-8') as f:
+from paths import APARTMENTS_PATH, PRICE_LIST_APARTMENTS_PATH
+
+logger = logging.getLogger(__name__)
+
+
+def load(fp=APARTMENTS_PATH):
+    with open(fp, 'r') as f:
         return json.load(f)
-    
+
+
 def prepare_data(apartments):
     return list(apartments)
+
 
 def finalize_data(apartments, summary, price_list_apartments):
     for apt, quantity in summary.items():
@@ -15,22 +23,22 @@ def finalize_data(apartments, summary, price_list_apartments):
         if 'Washes' not in apartments[apt]:
             apartments[apt]['Washes'] = {}
 
+        if apt not in price_list_apartments:
+            continue
+
         apartments[apt]['Washes']['Price'] = price_list_apartments[apt]
         apartments[apt]['Washes']['Quantity'] = quantity
-        apartments[apt]['Washes']['Total'] = quantity * apartments[apt]['Washes']['Price']
-    
+        apartments[apt]['Washes']['Total'] = round(quantity * apartments[apt]['Washes']['Price'], 2)
+
     return apartments
 
-def create_summary():
-    # I don't use this since I don't run this file from main()
-    pass
 
-def save(data, fp):
-    with open(fp, 'w', encoding='utf-8') as f:
+def save(data, fp=APARTMENTS_PATH):
+    with open(fp, 'w') as f:
         json.dump(data, f, indent=4)
 
-def main():
-    apartments = load('data/apartments.json')
-    prepare_data(apartments)
-    finalized_data = finalize_data(apartments, create_summary(apartments), load('data/price_list_apartments.json'))
-    save(finalized_data, 'data/apartments.json')
+
+def main(summary, price_list_apartments, apartments_path=APARTMENTS_PATH, out_path=APARTMENTS_PATH):
+    apartments = load(apartments_path)
+    finalized_data = finalize_data(apartments, summary, price_list_apartments)
+    save(finalized_data, out_path)

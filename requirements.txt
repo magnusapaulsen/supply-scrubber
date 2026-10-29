@@ -2,3 +2,4 @@ CTkSpinbox==1.4.1
 customtkinter==5.2.2
 pymupdf
 reportlab==4.4.7
+pytest

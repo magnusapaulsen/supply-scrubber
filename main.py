@@ -1,11 +1,24 @@
+import argparse
+import logging
+import os
+import platform
+
 import customtkinter as ctk
+import queue
 import threading
 from tkinter import filedialog, PhotoImage
+
 from CTkSpinbox import CTkSpinbox
-import queue
-import platform
-import os
-import pdf_parser, calculate_total, apartment_summary, wash_summary, pdf_generator
+
+import apartment_summary
+import calculate_total
+import pdf_generator
+import pdf_parser
+import paths
+import wash_summary
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Create queue for multithreading
 update_queue = queue.Queue()
@@ -20,6 +33,7 @@ def select_file(ui):
         ui['file'].configure(text = filename) # Show filename
         ui['run'].configure(state = 'normal', text = 'Run', fg_color = '#ff0000', hover_color = "#aa0000", text_color = '#ffffff') # Enable Run button
         ui['run'].selected_file = filepath # Store selected file for when we run the parsing
+
 
 def worker(ui):
     try:
@@ -38,9 +52,9 @@ def worker(ui):
         apartment_summary.main()
 
         update_queue.put(('status', 'Waiting for input...'))
-        apartments = wash_summary.load('data/apartments.json')
+        apartments = wash_summary.load(paths.APARTMENTS_PATH)
         apts = wash_summary.prepare_data(apartments)
-        price_list_apartments = wash_summary.load('data/price_list_apartments.json')
+        price_list_apartments = wash_summary.load(paths.PRICE_LIST_APARTMENTS_PATH)
 
         summary = {}
         for apt in apts:
@@ -51,24 +65,16 @@ def worker(ui):
                 if msg[0] == 'answer' and msg[1] == apt:
                     summary[apt] = msg[2]
                     break
-        wash_summary.save(wash_summary.finalize_data(apartments, summary, price_list_apartments), 'data/apartments.json')
+        wash_summary.save(wash_summary.finalize_data(apartments, summary, price_list_apartments), paths.APARTMENTS_PATH)
 
         update_queue.put(('status', 'Complete!', '#00ff00'))
         update_queue.put(('show_generate',))
 
     except Exception as e:
+        logger.exception('Pipeline failed')
         update_queue.put(('status', f'Error: {e}', '#ff4444'))
+        update_queue.put(('exit',))
 
-def run_in_thread(ui):
-    ui['run'].configure(
-        text = 'Running...',
-        fg_color = ['#cccccc', '#333333'],
-        text_color = '#ffffff',
-        text_color_disabled = ['#aaaaaa', '#555555'],
-        state = 'disabled'
-    )
-    threading.Thread(target = worker, args = (ui,), daemon = True).start() # Start background thread for GUI
-    check_queue(ui) # Start loop that looks for new messages to update GUI with
 
 def check_queue(ui):
     try:
@@ -96,7 +102,7 @@ def check_queue(ui):
 def create_gui():
     # Set color mode and color theme
     ctk.set_appearance_mode('Dark') # 'Dark', 'Light' or 'System'
-    ctk.set_default_color_theme('data/color_theme.json')
+    ctk.set_default_color_theme(os.path.join(paths.DATA_DIR, 'color_theme.json'))
 
     # Create GUI window and set title, size and icon
     root = ctk.CTk()
@@ -105,8 +111,8 @@ def create_gui():
 
     # Set icon
     system = platform.system()
-    ico_path = 'data/icon.ico'
-    png_path = 'data/icon.png'
+    ico_path = os.path.join(paths.DATA_DIR, 'icon.ico')
+    png_path = os.path.join(paths.DATA_DIR, 'icon.png')
 
     if system == 'Windows' and os.path.exists(ico_path):
         root.iconbitmap(ico_path)
@@ -115,9 +121,9 @@ def create_gui():
             img = PhotoImage(file=png_path)
             root.iconphoto(True, img)
         except Exception as e:
-            print(f'Could not load PNG icon: {e}')
+            logger.warning(f'Could not load PNG icon: {e}')
     else:
-        print('Something went wrong while trying to load icons...')
+        logger.warning('Something went wrong while trying to load icons...')
 
     root.grid_rowconfigure(0, weight = 0)
     root.grid_columnconfigure(0, weight = 1)
@@ -147,15 +153,15 @@ def create_gui():
     ui['file'] = ctk.CTkLabel(
         root,
         text = 'No file selected',
-        font = ctk.CTkFont(size = 12, weight = 'normal')
+        font = ctk.CTkFont(size = 12, weight = 'normal'),
     )
     ui['file'].grid(row = 2, column = 0, pady = 12)
 
     # Add status label to gui dictionary
     ui['status'] = ctk.CTkLabel(
         root,
-        text='',
-        font = ctk.CTkFont(size = 12, weight = 'normal')
+        text = '',
+        font = ctk.CTkFont(size = 12, weight = 'normal'),
     )
     ui['status'].grid(row = 3, column = 0, pady = 24)
 
@@ -172,6 +178,17 @@ def create_gui():
     ui['run'].grid(row = 4, column = 0, pady = 12)
 
     return root, ui
+
+def run_in_thread(ui):
+    ui['run'].configure(
+        text = 'Running...',
+        fg_color = ['#cccccc', '#333333'],
+        text_color = '#ffffff',
+        text_color_disabled = ['#aaaaaa', '#555555'],
+        state = 'disabled'
+    )
+    threading.Thread(target = worker, args = (ui,), daemon = True).start() # Start background thread for GUI
+    check_queue(ui) # Start loop that looks for new messages to update GUI with
 
 def show_generate_button(ui):
     btn = ctk.CTkButton(
@@ -204,7 +221,7 @@ def get_input(ui, apartment: str):
     frame = ctk.CTkFrame(ui['root'], fg_color = 'transparent', corner_radius = 10)
     frame.grid(row = 5, column = 0, pady = 24)
     ui['root'].wash_frame = frame
-    
+
     frame.grid_rowconfigure(0, weight = 0)
     frame.grid_columnconfigure(0, weight = 1)
 
@@ -231,8 +248,36 @@ def get_input(ui, apartment: str):
     butt = ctk.CTkButton(frame, corner_radius = 10, fg_color = '#ff0000', hover_color = '#aa0000', text_color = '#ffffff', font = ctk.CTkFont(size = 12, weight = 'normal'), text = 'Submit', command = submit)
     butt.grid(row = 2, column = 0, pady = 6)
 
-    
+def run_cli(pdf_path):
+    # Automatic mode: parse the given invoice and generate the report PDF without the GUI
+    logger.info('Running automatic report pipeline for: %s', pdf_path)
+    washes = pdf_parser.parse_pdf(pdf_path)
+    price_list_items = calculate_total.load(paths.PRICE_LIST_ITEMS_PATH)
+    washes = calculate_total.calculate_total(washes, price_list_items)
+    grouped = apartment_summary.group_by_name(washes)
+    apartment_summary.save(grouped, paths.APARTMENTS_PATH)
+
+    summary = {}
+    for wash in washes:
+        name = wash.get('Name')
+        if name:
+            summary[name] = summary.get(name, 0) + 1
+
+    finalized = wash_summary.finalize_data(grouped, summary, wash_summary.load(paths.PRICE_LIST_APARTMENTS_PATH))
+    wash_summary.save(finalized, paths.APARTMENTS_PATH)
+    pdf_generator.generate_pdf(finalized, paths.PDF_PATH)
+    logger.info('PDF successfully created: %s', paths.PDF_PATH)
+
+def main():
+    parser = argparse.ArgumentParser(description = 'supply-scrubber - desktop tool that generates accountant-ready PDF cleaning cost reports from cleaning company invoices.')
+    parser.add_argument('--pdf', type = str, help = 'Path to a cleaning invoice PDF. When given, runs the full pipeline automatically and generates the report PDF (data/apartments.pdf) without opening the GUI.')
+    args = parser.parse_args()
+
+    if args.pdf:
+        run_cli(args.pdf)
+    else:
+        root, ui = create_gui()
+        root.mainloop()
 
 if __name__ == '__main__':
-    root, ui = create_gui()
-    root.mainloop()
+    main()

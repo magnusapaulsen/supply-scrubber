@@ -1,6 +1,7 @@
 data/*.pdf
 .DS_Store
 __pycache__
+.pytest_cache
 data/price_list_apartments.json
 data/price_list_items.json
 washes.json

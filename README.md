@@ -11,6 +11,10 @@
 - Calculates exact costs per stay and per month
 - Saves structured overviews as JSON (`washes.json`, `apartments.json`)
 - Generates a clean, multi-page PDF report (one page per apartment) ready for the accountant
+- Two run modes:
+  - **GUI** (`python main.py`): interactive per-apartment cleaning counts via spinbox
+  - **Automatic** (`python main.py --pdf <invoice.pdf>`): zero-interaction pipeline, ideal for LLM agents
+- Testable pipeline with a pytest suite
 
 ## Screenshots
 <div>
@@ -55,11 +59,30 @@
     Run parsing.
     Fill in number of cleanings (arrow keys and enter work too).
     Click 'Generate PDF' once it appears.
+
+### Automatic mode (no GUI)
+
+To run the full pipeline on an invoice and produce the final report PDF directly:
+
+```bash
+python main.py --pdf /path/to/invoice.pdf
+```
+
+This parses the PDF, calculates totals, groups apartments, assigns one wash per parsed wash, and writes the finished PDF to `data/apartments.pdf`. No interactive input is required. This is the mode an LLM agent would use to fulfill a request like "take this invoice and use supply-scrubber to generate a PDF for my accountant."
+
+## Testing
+
+```bash
+python -m pytest
+```
+
+The test suite covers the calculation, grouping, and finalize logic, plus PDF generation. All tests run without the GUI or a display server.
      
 ## Requirements
 - `CTkSpinbox`
 - `customtkinter`
 - `pymupdf`
 - `reportlab`
+- `pytest` (for running the test suite)
 
 List of dependencies is in `requirements.txt`.
