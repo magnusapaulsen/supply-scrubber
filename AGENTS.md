@@ -33,3 +33,8 @@ There is no linter, typechecker, or CI configured. Automated verification is the
 
 - No linter/typechecker/CI configured.
 - Don't add scaffolding or tooling unprompted; keep changes minimal and consistent with the flat-module style.
+
+
+## Keeping both in sync
+
+- When this file is edited, keep the counterpart agent instruction file in sync (OpenCode: `AGENTS.md` / Claude Code: `CLAUDE.md`).
